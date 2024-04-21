@@ -7,14 +7,6 @@
 
 #include <omp.h>
 
-#if not defined(GRAPH_TYPE)
-#define GRAPH_TYPE float
-#endif
-
-#if not defined(TEST_SIZE)
-#define TEST_SIZE 1000
-#endif
-
 
 #define NUM_THREADS     ( std::thread::hardware_concurrency() )
 
@@ -25,13 +17,14 @@ auto Shortcut(Graph<T> const & graph) -> Graph<T>;
 auto main() -> int
 {
     Graph<GRAPH_TYPE> graph{TEST_SIZE};
+    graph.Randomize();
 
     omp_set_num_threads(NUM_THREADS);
 
     MeasureTime([&] -> void
                 {
                     auto const result = Shortcut(graph);
-                }, std::format("OpenMP ({} threads) with size {}", NUM_THREADS, TEST_SIZE));
+                }, std::format("Cached OpenMP ({} threads) with size {}", NUM_THREADS, TEST_SIZE));
 
 
     return 0;
@@ -42,10 +35,21 @@ auto Shortcut(Graph<T> const & graph) -> Graph<T>
 {
     Graph<T> result{graph.size()};
 
-    #pragma omp parallel for default(none) shared(graph, result)
-    for (std::size_t i = 0; i < graph.size(); ++i)
+    Graph<T> transposed{graph.size()};
+
+    #pragma omp parallel for default(none) shared(graph, transposed)
+    for (std::size_t row = 0; row < graph.size(); ++row)
     {
-        for (std::size_t j = 0; j < graph.size(); ++j)
+        for (std::size_t col = 0; col < graph.size(); ++col)
+        {
+            transposed[row, col] = graph[col, row];
+        }
+    }
+
+    #pragma omp parallel for default(none) shared(graph, result, transposed)
+    for (std::size_t row = 0; row < graph.size(); ++row)
+    {
+        for (std::size_t col = 0; col < graph.size(); ++col)
         {
             T minimum{0};
 
@@ -60,10 +64,10 @@ auto Shortcut(Graph<T> const & graph) -> Graph<T>
 
             for (std::size_t k = 0; k < graph.size(); ++k)
             {
-                minimum = std::min(minimum, graph[i, k] + graph[k, j]);
+                minimum = std::min(minimum, graph[row, k] + transposed[col, k]);
             }
 
-            result[i, j] = minimum;
+            result[row, col] = minimum;
         }
     }
 

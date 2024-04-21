@@ -3,6 +3,12 @@
 
 #include <limits>
 #include <format>
+#include <thread>
+
+#include <omp.h>
+
+
+#define NUM_THREADS     ( std::thread::hardware_concurrency() )
 
 
 template<typename T>
@@ -13,10 +19,12 @@ auto main() -> int
     Graph<GRAPH_TYPE> graph{TEST_SIZE};
     graph.Randomize();
 
+    omp_set_num_threads(NUM_THREADS);
+
     MeasureTime([&] -> void
                 {
                     auto const result = Shortcut(graph);
-                }, std::format("Naive with size {}", TEST_SIZE));
+                }, std::format("Naive OpenMP ({} threads) with size {}", NUM_THREADS, TEST_SIZE));
 
 
     return 0;
@@ -27,6 +35,7 @@ auto Shortcut(Graph<T> const & graph) -> Graph<T>
 {
     Graph<T> result{graph.size()};
 
+    #pragma omp parallel for default(none) shared(graph, result)
     for (std::size_t row = 0; row < graph.size(); ++row)
     {
         for (std::size_t col = 0; col < graph.size(); ++col)

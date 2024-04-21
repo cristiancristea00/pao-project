@@ -27,6 +27,16 @@ auto Shortcut(Graph<T> const & graph) -> Graph<T>
 {
     Graph<T> result{graph.size()};
 
+    Graph<T> transposed{graph.size()};
+
+    for (std::size_t row = 0; row < graph.size(); ++row)
+    {
+        for (std::size_t col = 0; col < graph.size(); ++col)
+        {
+            transposed[row, col] = graph[col, row];
+        }
+    }
+
     for (std::size_t row = 0; row < graph.size(); ++row)
     {
         for (std::size_t col = 0; col < graph.size(); ++col)
@@ -44,7 +54,7 @@ auto Shortcut(Graph<T> const & graph) -> Graph<T>
 
             for (std::size_t k = 0; k < graph.size(); ++k)
             {
-                minimum = std::min(minimum, graph[row, k] + graph[k, col]);
+                minimum = std::min(minimum, graph[row, k] + transposed[col, k]);
             }
 
             result[row, col] = minimum;
