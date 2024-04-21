@@ -2,6 +2,7 @@
 #include <Time.hpp>
 
 #include <limits>
+#include <format>
 
 #if not defined(GRAPH_TYPE)
 #define GRAPH_TYPE float
@@ -22,7 +23,7 @@ auto main() -> int
     MeasureTime([&] -> void
                 {
                     auto const result = Shortcut(graph);
-                }, "Naive");
+                }, std::format("Naive with size {}", TEST_SIZE));
 
 
     return 0;
@@ -33,13 +34,12 @@ auto Shortcut(Graph<T> const & graph) -> Graph<T>
 {
     Graph<T> result{graph.size()};
 
-    T minimum{0};
-    T current{0};
-
     for (std::size_t i = 0; i < graph.size(); ++i)
     {
         for (std::size_t j = 0; j < graph.size(); ++j)
         {
+            T minimum{0};
+
             if constexpr (std::numeric_limits<T>::has_infinity)
             {
                 minimum = std::numeric_limits<T>::infinity();
@@ -51,8 +51,7 @@ auto Shortcut(Graph<T> const & graph) -> Graph<T>
 
             for (std::size_t k = 0; k < graph.size(); ++k)
             {
-                current = graph[i, k] + graph[k, j];
-                minimum = std::min(minimum, current);
+                minimum = std::min(minimum, graph[i, k] + graph[k, j]);
             }
 
             result[i, j] = minimum;
