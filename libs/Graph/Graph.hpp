@@ -1,6 +1,5 @@
 #pragma once
 
-#include <cstdint>
 #include <vector>
 
 
@@ -12,26 +11,44 @@ struct Vector
 };
 
 
-template<typename T, typename VECTOR = Vector::base_type>
+template <typename T, typename VECTOR = Vector::base_type>
 class Graph
 {
 public:
+    Graph() noexcept = default;
+
     explicit Graph(std::size_t const size) noexcept;
+
     Graph(std::initializer_list<std::initializer_list<T>> const & init) noexcept;
 
     auto Randomize() noexcept -> void;
 
-    [[nodiscard]] constexpr auto size() const noexcept -> std::size_t { return matrix.size(); }
-    [[nodiscard]] constexpr auto sizeVec() const noexcept -> std::size_t { return numVectors; }
+    auto Checksum() const noexcept -> T;
 
-    constexpr auto operator[](std::size_t const row, std::size_t const col) const noexcept -> T const & { return matrix[row][col]; }
+    [[nodiscard]] constexpr auto size() const noexcept -> std::size_t
+    {
+        return matrix.size();
+    }
 
-    constexpr auto operator[](std::size_t const row, std::size_t const col) noexcept -> T & { return matrix[row][col]; }
+    [[nodiscard]] constexpr auto sizeVec() const noexcept -> std::size_t
+    {
+        return numVectors;
+    }
+
+    constexpr auto operator[](std::size_t const row, std::size_t const col) const noexcept -> T const &
+    {
+        return matrix[row][col];
+    }
+
+    constexpr auto operator[](std::size_t const row, std::size_t const col) noexcept -> T &
+    {
+        return matrix[row][col];
+    }
 
 private:
     std::vector<std::vector<T>> matrix;
 
-    std::size_t const numVectors;
+    std::size_t numVectors{0};
 
     static constexpr std::size_t SEED{0xDEADBEEF42};
 };

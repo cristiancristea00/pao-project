@@ -3,9 +3,10 @@
 
 #include <limits>
 #include <format>
+#include <print>
 
 
-template<typename T>
+template <typename T>
 auto Shortcut(Graph<T> const & graph) -> Graph<T>;
 
 auto main() -> int
@@ -13,16 +14,21 @@ auto main() -> int
     Graph<GRAPH_TYPE> graph{TEST_SIZE};
     graph.Randomize();
 
-    MeasureTime([&] -> void
-                {
-                    auto const result = Shortcut(graph);
-                }, std::format("Naive with size {}", TEST_SIZE));
+    Graph<GRAPH_TYPE> result;
 
+    MeasureTime(
+        [&] -> void
+        {
+            result = Shortcut(graph);
+        }, std::format("Naive with size {}", TEST_SIZE)
+    );
+
+    std::println("Checksum: {}", result.Checksum());
 
     return 0;
 }
 
-template<typename T>
+template <typename T>
 auto Shortcut(Graph<T> const & graph) -> Graph<T>
 {
     Graph<T> result{graph.size()};

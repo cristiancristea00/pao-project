@@ -1,8 +1,9 @@
 #include <Graph.hpp>
 #include <Time.hpp>
 
-#include <limits>
 #include <format>
+#include <limits>
+#include <print>
 #include <thread>
 
 #include <omp.h>
@@ -11,16 +12,17 @@
 #define NUM_THREADS     ( std::thread::hardware_concurrency() )
 
 
-template<typename T>
+template <typename T>
 auto Shortcut(Graph<T> const & graph) -> Graph<T>;
 
 auto GetInfinity() -> Vector::type;
+
 auto HorizontalMin(Vector::type const & vector) -> Vector::base_type;
+
 auto ElementWiseMin(Vector::type const & lhs, Vector::type const & rhs) -> Vector::type;
 
 
-static constexpr auto MAX = std::numeric_limits<Vector::base_type>::has_infinity ?
-                            std::numeric_limits<Vector::base_type>::infinity() : std::numeric_limits<Vector::base_type>::max();
+static constexpr auto MAX = std::numeric_limits<Vector::base_type>::has_infinity ? std::numeric_limits<Vector::base_type>::infinity() : std::numeric_limits<Vector::base_type>::max();
 
 
 auto main() -> int
@@ -30,15 +32,21 @@ auto main() -> int
 
     omp_set_num_threads(NUM_THREADS);
 
-    MeasureTime([&] -> void
-                {
-                    auto const result = Shortcut(graph);
-                }, std::format("SIMD OpenMP ({} threads) with size {}", NUM_THREADS, TEST_SIZE));
+    Graph<GRAPH_TYPE> result;
+
+    MeasureTime(
+        [&] -> void
+        {
+            result = Shortcut(graph);
+        }, std::format("SIMD OpenMP ({} threads) with size {}", NUM_THREADS, TEST_SIZE)
+    );
+
+    std::println("Checksum: {}", result.Checksum());
 
     return 0;
 }
 
-template<typename T>
+template <typename T>
 auto Shortcut(Graph<T> const & graph) -> Graph<T>
 {
     Graph<T> result{graph.size()};

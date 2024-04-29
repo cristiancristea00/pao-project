@@ -1,7 +1,7 @@
 #include "Graph.hpp"
 
-#include <random>
 #include <iostream>
+#include <random>
 
 
 template
@@ -11,42 +11,53 @@ template
 class Graph<Vector::type>;
 
 
-template<typename T, typename VECTOR>
+template <typename T, typename VECTOR>
 Graph<T, VECTOR>::Graph(std::size_t const size) noexcept : numVectors{(size + Vector::size::value - 1) / Vector::size::value}
 {
     matrix.resize(size);
 
     if constexpr (std::is_scalar<T>::value)
     {
-        for (auto & item: matrix)
+        for (auto & item : matrix)
         {
             item.resize(size);
         }
     }
     else
     {
-        for (auto & item: matrix)
+        for (auto & item : matrix)
         {
             item.resize(numVectors);
         }
     }
 }
 
-template<typename T, typename VECTOR>
+
+template <typename T, typename VECTOR>
+Graph<T, VECTOR>::Graph(std::initializer_list<std::initializer_list<T>> const & init) noexcept : numVectors{(init.size() + Vector::size::value - 1) / Vector::size::value}
+{
+    matrix.reserve(init.size());
+
+    for (auto const & list : init)
+    {
+        matrix.emplace_back(list);
+    }
+}
+
+template <typename T, typename VECTOR>
 auto Graph<T, VECTOR>::Randomize() noexcept -> void
 {
     std::mt19937 randomEngine{SEED};
 
     if constexpr (std::is_scalar<T>::value)
     {
-
         if constexpr (std::is_floating_point<T>::value)
         {
             std::uniform_real_distribution<T> randomDistribution{0, 1};
 
-            for (auto & row: matrix)
+            for (auto & row : matrix)
             {
-                for (auto & item: row)
+                for (auto & item : row)
                 {
                     item = randomDistribution(randomEngine);
                 }
@@ -56,9 +67,9 @@ auto Graph<T, VECTOR>::Randomize() noexcept -> void
         {
             std::uniform_int_distribution<T> randomDistribution{0, std::numeric_limits<T>::max()};
 
-            for (auto & row: matrix)
+            for (auto & row : matrix)
             {
-                for (auto & item: row)
+                for (auto & item : row)
                 {
                     item = randomDistribution(randomEngine);
                 }
@@ -71,9 +82,9 @@ auto Graph<T, VECTOR>::Randomize() noexcept -> void
         {
             std::uniform_real_distribution<VECTOR> randomDistribution{0, 1};
 
-            for (auto & row: matrix)
+            for (auto & row : matrix)
             {
-                for (auto & item: row)
+                for (auto & item : row)
                 {
                     for (std::size_t idx = 0; idx < Vector::size::value; ++idx)
                     {
@@ -86,9 +97,9 @@ auto Graph<T, VECTOR>::Randomize() noexcept -> void
         {
             std::uniform_int_distribution<VECTOR> randomDistribution{0, std::numeric_limits<VECTOR>::max()};
 
-            for (auto & row: matrix)
+            for (auto & row : matrix)
             {
-                for (auto & item: row)
+                for (auto & item : row)
                 {
                     for (std::size_t idx = 0; idx < Vector::size::value; ++idx)
                     {
@@ -100,13 +111,15 @@ auto Graph<T, VECTOR>::Randomize() noexcept -> void
     }
 }
 
-template<typename T, typename VECTOR>
-Graph<T, VECTOR>::Graph(std::initializer_list<std::initializer_list<T>> const & init) noexcept : numVectors{(init.size() + Vector::size::value - 1) / Vector::size::value}
+template <typename T, typename VECTOR>
+auto Graph<T, VECTOR>::Checksum() const noexcept -> T
 {
-    matrix.reserve(init.size());
+    T sum{0};
 
-    for (auto const & list: init)
+    for (auto const & row : matrix)
     {
-        matrix.emplace_back(list);
+        sum += std::accumulate(row.cbegin(), row.cend(), T{0});
     }
+
+    return sum;
 }
