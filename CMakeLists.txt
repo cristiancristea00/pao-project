@@ -1,8 +1,7 @@
 cmake_minimum_required(VERSION 3.27)
-project("PAO Project" LANGUAGES CXX CUDA)
+project("PAO Project" LANGUAGES CXX)
 
 set(TEST_SIZE 1000)
-set(GRAPH_TYPE float)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CUDA_STANDARD 23)
@@ -29,20 +28,17 @@ find_package(OpenCL REQUIRED)
 
 add_subdirectory(libs/Graph)
 add_subdirectory(libs/Time)
+add_subdirectory(libs/OpenCLHelpers)
 
 set(VARIANTS Naive Cached SIMD NaiveOpenMP CachedOpenMP SIMDOpenMP OpenCL)
 
 foreach(VARIANT ${VARIANTS})
     message(STATUS "Configuring ${VARIANT} variant")
 
-    file(GLOB_RECURSE SOURCES ${CMAKE_SOURCE_DIR}/${VARIANT}/*.cpp ${CMAKE_SOURCE_DIR}/${VARIANT}/*.cu)
+    file(GLOB_RECURSE SOURCES ${CMAKE_SOURCE_DIR}/${VARIANT}/*.cpp)
     add_executable(${VARIANT} ${SOURCES})
 
-    if(DEFINED GRAPH_TYPE)
-        target_compile_definitions(${VARIANT} PRIVATE GRAPH_TYPE=${GRAPH_TYPE})
-    else()
-        target_compile_definitions(${VARIANT} PRIVATE GRAPH_TYPE=float)
-    endif()
+    target_compile_definitions(${VARIANT} PRIVATE GRAPH_TYPE=float)
 
     if(DEFINED TEST_SIZE)
         target_compile_definitions(${VARIANT} PRIVATE TEST_SIZE=${TEST_SIZE})
@@ -60,6 +56,8 @@ foreach(VARIANT ${VARIANTS})
         target_link_libraries(${VARIANT} PRIVATE OpenCL::OpenCL)
         target_compile_definitions(${VARIANT} PRIVATE CL_HPP_TARGET_OPENCL_VERSION=300)
         target_compile_definitions(${VARIANT} PRIVATE CL_HPP_ENABLE_EXCEPTIONS)
+        target_include_directories(${VARIANT} PRIVATE ${CMAKE_SOURCE_DIR}/libs/OpenCLHelpers)
+        target_link_libraries(${VARIANT} PRIVATE OpenCLHelpers)
     endif()
 endforeach()
 

@@ -25,9 +25,19 @@ public:
 
     auto Checksum() const noexcept -> T;
 
+    [[nodiscard]] constexpr auto data() const noexcept -> std::vector<T> const &
+    {
+        return matrix;
+    }
+
+    [[nodiscard]] constexpr auto data() noexcept -> std::vector<T> &
+    {
+        return matrix;
+    }
+
     [[nodiscard]] constexpr auto size() const noexcept -> std::size_t
     {
-        return matrix.size();
+        return numElements;
     }
 
     [[nodiscard]] constexpr auto sizeVec() const noexcept -> std::size_t
@@ -37,17 +47,18 @@ public:
 
     constexpr auto operator[](std::size_t const row, std::size_t const col) const noexcept -> T const &
     {
-        return matrix[row][col];
+        return matrix[row * numElements + col];
     }
 
     constexpr auto operator[](std::size_t const row, std::size_t const col) noexcept -> T &
     {
-        return matrix[row][col];
+        return matrix[row * numElements + col];
     }
 
 private:
-    std::vector<std::vector<T>> matrix;
+    std::vector<T> matrix;
 
+    std::size_t numElements{0};
     std::size_t numVectors{0};
 
     static constexpr std::size_t SEED{0xDEADBEEF42};
