@@ -20,7 +20,7 @@ auto main() -> int
         [&] -> void
         {
             result = Shortcut(graph);
-        }, std::format("Naive with size {}", TEST_SIZE)
+        }, std::format("Cached with size {}", TEST_SIZE)
     );
 
     std::println("Checksum: {}", result.Checksum());

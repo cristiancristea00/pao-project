@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.27)
 project("PAO Project" LANGUAGES CXX)
 
-set(TEST_SIZE 2000)
+set(TEST_SIZE 5000)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CUDA_STANDARD 23)
