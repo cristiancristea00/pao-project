@@ -57,16 +57,7 @@ auto Shortcut(Graph<T> const & graph) -> Graph<T>
     {
         for (std::size_t col = 0; col < graph.size(); ++col)
         {
-            T minimum{0};
-
-            if constexpr (std::numeric_limits<T>::has_infinity)
-            {
-                minimum = std::numeric_limits<T>::infinity();
-            }
-            else
-            {
-                minimum = std::numeric_limits<T>::max();
-            }
+            T minimum{max_value<T>::get()};
 
             for (std::size_t k = 0; k < graph.size(); ++k)
             {
