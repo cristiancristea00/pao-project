@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.27)
 project("PAO Project" LANGUAGES CXX)
 
-set(TEST_SIZE 1000)
+set(TEST_SIZE 2000)
 
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CUDA_STANDARD 23)
@@ -30,7 +30,7 @@ add_subdirectory(libs/Graph)
 add_subdirectory(libs/Time)
 add_subdirectory(libs/OpenCLHelpers)
 
-set(VARIANTS Naive Cached SIMD NaiveOpenMP CachedOpenMP SIMDOpenMP OpenCL)
+set(VARIANTS Naive Cached SIMD NaiveOpenMP CachedOpenMP SIMDOpenMP OpenCL OpenCLSwapped)
 
 foreach(VARIANT ${VARIANTS})
     message(STATUS "Configuring ${VARIANT} variant")
