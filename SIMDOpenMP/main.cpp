@@ -15,14 +15,14 @@
 template <typename T>
 auto Shortcut(Graph<T> const & graph) -> Graph<T>;
 
-auto GetInfinity() -> Vector::type;
+[[gnu::const]] auto GetInfinity() -> Vector::type;
 
-auto HorizontalMin(Vector::type const & vector) -> Vector::base_type;
+[[gnu::pure]] auto HorizontalMin(Vector::type const & vector) -> Vector::base_type;
 
-auto ElementWiseMin(Vector::type const & lhs, Vector::type const & rhs) -> Vector::type;
+[[gnu::pure]] auto ElementWiseMin(Vector::type const & lhs, Vector::type const & rhs) -> Vector::type;
 
 
-static constexpr auto MAX = std::numeric_limits<Vector::base_type>::has_infinity ? std::numeric_limits<Vector::base_type>::infinity() : std::numeric_limits<Vector::base_type>::max();
+static constexpr auto MAX = max_value<Vector::base_type>::get();
 
 
 auto main() -> int
@@ -88,8 +88,7 @@ auto Shortcut(Graph<T> const & graph) -> Graph<T>
     return result;
 }
 
-
-auto GetInfinity() -> Vector::type
+[[gnu::const]] auto GetInfinity() -> Vector::type
 {
     Vector::type result;
 
@@ -101,7 +100,7 @@ auto GetInfinity() -> Vector::type
     return result;
 }
 
-auto HorizontalMin(Vector::type const & vector) -> Vector::base_type
+[[gnu::pure]] auto HorizontalMin(Vector::type const & vector) -> Vector::base_type
 {
     Vector::base_type result{MAX};
 
@@ -113,7 +112,7 @@ auto HorizontalMin(Vector::type const & vector) -> Vector::base_type
     return result;
 }
 
-auto ElementWiseMin(Vector::type const & lhs, Vector::type const & rhs) -> Vector::type
+[[gnu::pure]] auto ElementWiseMin(Vector::type const & lhs, Vector::type const & rhs) -> Vector::type
 {
     return lhs < rhs ? lhs : rhs;
 }
